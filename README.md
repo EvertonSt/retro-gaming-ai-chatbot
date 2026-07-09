@@ -7,7 +7,7 @@ An AI chatbot focused on general retro gaming, built with vanilla JavaScript and
 ![License](https://img.shields.io/badge/License-MIT-green)
 
 ## Live demo
-https://[YOUR_DEPLOY_URL_HERE]
+https://https://YOUR_DEPLOY_URL_HERE
 
 ## What this project shows
 - **Prompt engineering:** system prompt with scope discipline, topic matching, and fallback strategy
@@ -23,7 +23,7 @@ https://[YOUR_DEPLOY_URL_HERE]
 
 ## Quick start
 ```bash
-git clone https://github.com/[YOUR_USERNAME]/retro-gaming-ai-chatbot.git
+git clone https://github.com/EvertonSt/retro-gaming-ai-chatbot.git
 cd retro-gaming-ai-chatbot
 npx serve .
 ```
