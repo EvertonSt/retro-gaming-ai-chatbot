@@ -1,0 +1,12 @@
+{
+  "name": "retro-gaming-ai-chatbot",
+  "version": "1.0.0",
+  "description": "AI chatbot focused on retro gaming in general, built with vanilla JavaScript",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve ."
+  },
+  "keywords": ["ai", "chatbot", "retro", "gaming", "javascript"],
+  "author": "Everton Santana Andrade",
+  "license": "MIT"
+}

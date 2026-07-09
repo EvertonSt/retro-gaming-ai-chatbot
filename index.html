@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Retro Gaming AI Chatbot</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>Retro Gaming AI Chatbot</h1>
+      <p>Insert coin to begin — ask anything about retro consoles, 8-bit classics, 90s arcade, cartridges, glitches, and gaming history.</p>
+    </header>
+
+    <section class="chat">
+      <div class="config">
+        <label>OpenAI API key:</label>
+        <input id="apiKey" type="password" placeholder="sk-..." />
+        <small style="color: var(--muted);">Optional. Without it, the bot uses built-in demo responses.</small>
+      </div>
+
+      <div class="messages" id="messages">
+        <div class="msg bot">
+          Welcome to the Retro Gaming AI Chatbot! 🕹️ I cover classic consoles, pixelated heroes, arcade history, cheat codes, and more. What do you want to know?
+        </div>
+      </div>
+
+      <div class="suggestions">
+        <button class="chip" data-q="What are the best NES games?">Best NES games</button>
+        <button class="chip" data-q="Tell me about arcade history">Arcade history</button>
+        <button class="chip" data-q="How do I beat Contra without dying?">Contra tips</button>
+        <button class="chip" data-q="What caused the 1983 crash?">1983 crash</button>
+      </div>
+
+      <form class="input-row" id="chatForm">
+        <input id="userInput" placeholder="Ask about retro gaming..." autocomplete="off" />
+        <button type="submit">Insert Coin</button>
+      </form>
+
+      <div class="console-log" id="consoleLog">System &gt; Ready...</div>
+    </section>
+
+    <footer>
+      Built by Everton Santana Andrade — Portfolio piece: prompt engineering + retro gaming AI
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
