@@ -62,6 +62,10 @@ const TOPIC_MATCHES = [
 
 const FALLBACK = 'Great topic. Try asking about classic consoles (NES, SNES, Genesis), arcade history, Contra tips, the 1983 crash, Sega, handhelds, or specific retro games.';
 
+const STORAGE_KEY = 'retro_chat_history';
+const API_KEY_STORAGE_KEY = 'retro_openai_key';
+let chatHistory = [];
+
 function log(text) {
   const line = document.createElement('div');
   line.textContent = text;
@@ -69,12 +73,47 @@ function log(text) {
   CONSOLE.scrollTop = CONSOLE.scrollHeight;
 }
 
-function addMessage(text, sender) {
+function renderMessage(text, sender) {
   const el = document.createElement('div');
   el.className = 'msg ' + sender;
   el.textContent = text;
   MESSAGES.appendChild(el);
   MESSAGES.scrollTop = MESSAGES.scrollHeight;
+}
+
+function saveHistory() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(chatHistory));
+}
+
+function loadHistory() {
+  MESSAGES.innerHTML = '';
+  chatHistory = [];
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if (saved) {
+    try {
+      chatHistory = JSON.parse(saved);
+    } catch (e) {
+      chatHistory = [];
+    }
+  }
+
+  if (!chatHistory || chatHistory.length === 0) {
+    chatHistory = [{
+      sender: 'bot',
+      text: 'Welcome to the Retro Gaming AI Chatbot! 🕹️ I cover classic consoles, pixelated heroes, arcade history, cheat codes, and more. What do you want to know?'
+    }];
+    saveHistory();
+  }
+
+  chatHistory.forEach(msg => {
+    renderMessage(msg.text, msg.sender);
+  });
+}
+
+function addMessage(text, sender) {
+  chatHistory.push({ sender, text });
+  saveHistory();
+  renderMessage(text, sender);
 }
 
 function pickTopicReply(userText) {
@@ -112,7 +151,7 @@ async function callLLM(userText) {
     body: JSON.stringify(body)
   });
 
-  log('API &gt; ' + res.status + ' ' + res.statusText);
+  log('API > ' + res.status + ' ' + res.statusText);
 
   const data = await res.json();
   if (!res.ok) {
@@ -140,18 +179,71 @@ async function onSend(text) {
   try {
     const reply = await callLLM(userText);
     placeholder.textContent = reply;
-    log('Bot &gt; ' + reply.slice(0, 80) + (reply.length > 80 ? '...' : ''));
+    chatHistory.push({ sender: 'bot', text: reply });
+    saveHistory();
+    log('Bot > ' + reply.slice(0, 80) + (reply.length > 80 ? '...' : ''));
   } catch (e) {
-    placeholder.textContent = 'Error: ' + e.message;
-    log('Error &gt; ' + e.message);
+    const errorText = 'Error: ' + e.message;
+    placeholder.textContent = errorText;
+    chatHistory.push({ sender: 'bot', text: errorText });
+    saveHistory();
+    log('Error > ' + e.message);
   } finally {
     MESSAGES.scrollTop = MESSAGES.scrollHeight;
   }
 }
 
+// Hook up event listeners
 FORM.addEventListener('submit', (e) => {
   e.preventDefault();
   onSend();
 });
 
+const RESET_CHAT_BTN = document.getElementById('resetChat');
+let resetConfirmState = false;
+let resetTimeout = null;
+
+RESET_CHAT_BTN.addEventListener('click', () => {
+  if (!resetConfirmState) {
+    resetConfirmState = true;
+    RESET_CHAT_BTN.textContent = 'SURE?';
+    RESET_CHAT_BTN.classList.add('confirming');
+    
+    resetTimeout = setTimeout(() => {
+      resetConfirmState = false;
+      RESET_CHAT_BTN.textContent = 'Reset RAM';
+      RESET_CHAT_BTN.classList.remove('confirming');
+    }, 3000);
+  } else {
+    clearTimeout(resetTimeout);
+    resetConfirmState = false;
+    RESET_CHAT_BTN.textContent = 'Reset RAM';
+    RESET_CHAT_BTN.classList.remove('confirming');
+    
+    localStorage.removeItem(STORAGE_KEY);
+    loadHistory();
+    log('System > Chat history cleared. RAM reset.');
+  }
+});
+
+// Save API key on input change
+API_KEY_INPUT.addEventListener('input', () => {
+  localStorage.setItem(API_KEY_STORAGE_KEY, API_KEY_INPUT.value.trim());
+});
+
+// Handle suggestion chips
+document.querySelectorAll('.chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    const question = chip.getAttribute('data-q');
+    onSend(question);
+  });
+});
+
+// Initialization
+const savedApiKey = localStorage.getItem(API_KEY_STORAGE_KEY);
+if (savedApiKey) {
+  API_KEY_INPUT.value = savedApiKey;
+}
+loadHistory();
 INPUT.focus();
+
